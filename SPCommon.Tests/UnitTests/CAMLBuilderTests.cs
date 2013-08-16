@@ -1,10 +1,8 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SPCommon.CAML;
+using SPCommon.Interface;
 
 namespace SPCommon.Tests.UnitTests
 {
@@ -12,7 +10,7 @@ namespace SPCommon.Tests.UnitTests
     public class CAMLBuilderTests
     {
         [TestMethod]
-        public void CAMLBuilder_ProcessSingleExpression()
+        public void CAMLBuilder_SingleExpression()
         {
             var expression = GetSinglExpression();
             var builder = new CAMLBuilder(expression);
@@ -22,7 +20,7 @@ namespace SPCommon.Tests.UnitTests
 
 
         [TestMethod]
-        public void CAMLBuilder_ProcessConditionExpression()
+        public void CAMLBuilder_ConditionExpression()
         {
             var expression = GetConditionExpression();
             var builder = new CAMLBuilder(expression);
@@ -31,13 +29,13 @@ namespace SPCommon.Tests.UnitTests
         }
 
         [TestMethod]
-        public void CAMLBuilder_ProcessChainedExpressionWithOneElement()
+        public void CAMLBuilder_Chained_1_Expression()
         {
             var expression = GetSinglExpression();
             var chain = new CAMLChainedExpression
             {
                 Condition = CAMLCondition.And,
-                Expressions = new List<CAMLExpression> { expression } 
+                Expressions = new List<CAMLExpression> { expression as CAMLExpression} 
             };
             var builder = new CAMLBuilder(chain);
             var checkString = GetSingleCheckString(expression);
@@ -45,23 +43,23 @@ namespace SPCommon.Tests.UnitTests
         }
 
         [TestMethod]
-        public void CAMLBuilder_ProcessChainedExpressionWithTwoElements()
+        public void CAMLBuilder_Chained_2_Expression()
         {
-            var expression = GetSinglExpression();
+            var expression = GetSinglExpression() as CAMLExpression;
             var chain = new CAMLChainedExpression
             {
                 Condition = CAMLCondition.And,
                 Expressions = new List<CAMLExpression> { expression, expression }
             };
             var builder = new CAMLBuilder(chain);
-            var checkString = GetConditionCheckString(GetConditionExpression());
+            var checkString = GetConditionCheckString(GetConditionExpression() as CAMLConditionExpression);
             Assert.IsTrue(builder.ToString().Equals(checkString));
         }
 
         [TestMethod]
-        public void CAMLBuilder_ProcessChainedExpressionWithThreeElements()
+        public void CAMLBuilder_Chained_3_Expression()
         {
-            var expression = GetSinglExpression();
+            var expression = GetSinglExpression() as CAMLExpression;
             var chain = new CAMLChainedExpression
             {
                 Condition = CAMLCondition.And,
@@ -75,18 +73,19 @@ namespace SPCommon.Tests.UnitTests
         
         #region Private helper
 
-        private static CAMLConditionExpression GetConditionExpression()
+        private static ICAMLExpression GetConditionExpression()
         {
             return new CAMLConditionExpression
             {
-                Left = GetSinglExpression(),
-                Right = GetSinglExpression(),
+                Left = GetSinglExpression() as CAMLExpression,
+                Right = GetSinglExpression() as CAMLExpression,
                 Condition = CAMLCondition.And
             };
         }
 
-        private static string GetConditionCheckString(CAMLConditionExpression expression)
+        private static string GetConditionCheckString(ICAMLExpression caml)
         {
+            var expression = caml as CAMLConditionExpression;
             return String.Format(@"<Where><{0}>{1}{2}</{0}></Where>",
                                 expression.Condition,
                                 GetSingleString(expression.Left),
@@ -101,7 +100,7 @@ namespace SPCommon.Tests.UnitTests
                                 GetSingleString(expression));
         }
 
-        private static CAMLExpression GetSinglExpression()
+        private static ICAMLExpression GetSinglExpression()
         {
             return new CAMLExpression
             {
@@ -112,14 +111,15 @@ namespace SPCommon.Tests.UnitTests
             };
         }
 
-        private static string GetSingleCheckString(CAMLExpression expression)
+        private static string GetSingleCheckString(ICAMLExpression expression)
         {
             return String.Format(@"<Where>{0}</Where>", GetSingleString(expression));
         }
 
-        private static string GetSingleString(CAMLExpression expression)
+        private static string GetSingleString(ICAMLExpression caml)
         {
-            return String.Format(@"<{0}><FieldRef Name=""{1}""/><Value Type=""{2}"">{3}</Value></{0}>",
+            var expression = caml as CAMLExpression;
+            return String.Format(@"<{0}><FieldRef Name=""{1}""/><Value Type=""{2}""><![CDATA[{3}]]></Value></{0}>",
                 expression.Operator,
                 expression.Column,
                 expression.Type,
@@ -129,120 +129,5 @@ namespace SPCommon.Tests.UnitTests
         #endregion
     }
 
-    enum CAMLOperator
-    {
-        Eq, Contains, Neq, Like
-    }
 
-    enum  CAMLCondition
-    {
-        And, Or
-    }
-
-    class CAMLExpression
-    {
-        public string Column { get; set; }
-        public string Type { get; set; }
-        public string Value { get; set; }
-        public CAMLOperator Operator { get; set; }
-    }
-
-    class CAMLConditionExpression
-    {
-        public CAMLExpression Left { get; set; }
-        public CAMLExpression Right { get; set; }
-        public CAMLCondition Condition { get; set; }
-    }
-
-    class CAMLChainedExpression
-    {
-        public IList<CAMLExpression> Expressions { get; set; }
-        public CAMLCondition Condition { get; set; }
-    }
-
-    class CAMLBuilder
-    {
-        private readonly CAMLExpression _expression;
-        private readonly CAMLConditionExpression _conditionExpression;
-        private readonly CAMLChainedExpression _chaindExpression;
-
-        public CAMLBuilder(CAMLExpression expression)
-        {
-            _expression = expression;
-        }
-
-        public CAMLBuilder(CAMLConditionExpression conditionExpression)
-        {
-            _conditionExpression = conditionExpression;
-        }
-
-        public CAMLBuilder(CAMLChainedExpression chaindExpression)
-        {
-            _chaindExpression = chaindExpression;
-        }
-
-        public override string ToString()
-        {
-            return String.Format(@"<Where>{0}</Where>", GetCamlQuery());
-        }
-
-        public string GetCamlQuery()
-        {
-            var camlQuery = string.Empty;
-            if (_expression != null)
-                camlQuery = GetSingleExpression(_expression);
-            else if (_conditionExpression != null)
-                camlQuery = GetConditionExpression(_conditionExpression);
-            else if (_chaindExpression != null)
-                camlQuery = GetChainedExpression(_chaindExpression);
-            return camlQuery;
-        }
-
-        private static string GetChainedExpression(CAMLChainedExpression chainedExpression)
-        {
-            var statementList = chainedExpression.Expressions.Select(GetSingleExpression).ToList();
-            var statementStack = new Stack<string>();
-            foreach(var statement in statementList)
-                statementStack.Push(statement);
-
-            Func<Stack<string>, string> process = null;
-            process = (stack) =>
-            {
-                if (stack.Count == 0) return string.Empty;
-                if (stack.Count == 1) return stack.Pop();
-                var statement1 = stack.Pop();
-                var statement2 = stack.Pop();
-                var expr = String.Format(@"<{0}>{1}{2}</{0}>", chainedExpression.Condition, statement1, statement2);
-                stack.Push(expr);
-                return process(stack);
-            };
-
-            return process(statementStack);
-
-        }
-
-        private static string GetConditionExpression(CAMLConditionExpression conditionExpression)
-        {
-            var condition = conditionExpression.Condition.ToString();
-            var expression = String.Format(@"<{0}>{1}{2}</{0}>", 
-                                        condition,
-                                        GetSingleExpression(conditionExpression.Left),
-                                        GetSingleExpression(conditionExpression.Right));
-            return expression;
-        }
-
-        private static string GetSingleExpression(CAMLExpression expression)
-        {
-            var op = expression.Operator.ToString();
-            return String.Format(@"<{0}>{1}</{0}>", op, GetFieldRefExpression(expression));
-        }
-        
-        private static string GetFieldRefExpression(CAMLExpression expression)
-        {
-            return String.Format(@"<FieldRef Name=""{0}""/><Value Type=""{1}"">{2}</Value>",
-                                    expression.Column,
-                                    expression.Type,
-                                    expression.Value);            
-        }
-    }
 }

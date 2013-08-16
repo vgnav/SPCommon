@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CAML\CAMLBuilder.cs" />
     <Compile Include="Entity\BaseDocument.cs" />
     <Compile Include="Entity\BaseListItem.cs" />
     <Compile Include="CustomException\BaseException.cs" />
@@ -46,6 +47,7 @@
     <Compile Include="Entity\DataTypes\HyperLink.cs" />
     <Compile Include="Entity\DataTypes\PublishingImage.cs" />
     <Compile Include="Entity\DataTypes\TaxonomyValue.cs" />
+    <Compile Include="Interface\ICAMLExpression.cs" />
     <Compile Include="Interface\IDocumentRepository.cs" />
     <Compile Include="Interface\IListRepository.cs" />
     <Compile Include="Interface\ILogger.cs" />

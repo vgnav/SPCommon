@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using Microsoft.SharePoint;
+using SPCommon.CAML;
 using SPCommon.CustomException;
 using SPCommon.Entity;
 using SPCommon.Infrastructure.Common;
@@ -136,6 +137,15 @@ namespace SPCommon.Infrastructure.Repository
                 returnedList = GetAllItems(Web, query as SPQuery);
             }
             return returnedList;
+        }
+
+        public IList<T> FindByCAML(ICAMLExpression camlExpression)
+        {
+            var query = new SPQuery
+            {
+                Query = (new CAMLBuilder(camlExpression)).ToString()
+            };
+            return FindByQuery(query);
         }
 
         #endregion

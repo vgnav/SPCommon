@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.JSGrid;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SPCommon.CAML;
 using SPCommon.Entity;
 using SPCommon.Infrastructure.Repository;
 using SPCommon.Interface;
@@ -100,11 +101,43 @@ namespace SPCommon.Tests.IntegrationTests
 
             var spquery = new SPQuery
             {
-                // TODO: CAML query builder
                 Query = "<Where><Eq><FieldRef Name=\"Title\" /><Value Type=\"Text\">" + item1.Title +"</Value></Eq></Where>"
             };
 
             var items = _listRepository.FindByQuery(spquery);
+            var count = items.Count;
+
+            Assert.IsTrue(count == 5);
+
+            ResetList();
+        }
+
+        [TestMethod]
+        public void ListRepository_FindItemsByCAML()
+        {
+            ResetList();
+
+            var item1 = GetTestEntity();
+            var item2 = GetTestEntity();
+            var item3 = GetTestEntity();
+            var item4 = GetTestEntity();
+            var item5 = GetTestEntity();
+
+            _listRepository.Create(item1);
+            _listRepository.Create(item2);
+            _listRepository.Create(item3);
+            _listRepository.Create(item4);
+            _listRepository.Create(item5);
+
+            var caml = new CAMLExpression
+            {
+                Column = "Title",
+                Operator = CAMLOperator.Eq,
+                Type = "Text",
+                Value = item1.Title
+            };
+
+            var items = _listRepository.FindByCAML(caml);
             var count = items.Count;
 
             Assert.IsTrue(count == 5);
