@@ -24,14 +24,7 @@ namespace SPCommon.CAML
         public string Value { get; set; }
         public CAMLOperator Operator { get; set; }
     }
-
-    public class CAMLConditionExpression : ICAMLExpression
-    {
-        public CAMLExpression Left { get; set; }
-        public CAMLExpression Right { get; set; }
-        public CAMLCondition Condition { get; set; }
-    }
-
+    
     public class CAMLChainedExpression : ICAMLExpression
     {
         public IList<CAMLExpression> Expressions { get; set; }
@@ -59,12 +52,10 @@ namespace SPCommon.CAML
             if (_expression == null) return string.Empty;
             if(_expression is CAMLExpression)
                 return GetSingleExpression(_expression as CAMLExpression);
-            if (_expression is CAMLConditionExpression)
-                return GetConditionExpression(_expression as CAMLConditionExpression);
             if (_expression is CAMLChainedExpression)
                 return GetChainedExpression(_expression as CAMLChainedExpression);
             throw new InvalidCastException(
-                "_expression must be either CAMLExpression, CAMLConditionExpression, or CAMLChainedExpression type");
+                "_expression must be either CAMLExpression or CAMLChainedExpression type");
         }
 
         private static string GetChainedExpression(CAMLChainedExpression chainedExpression)
@@ -78,6 +69,8 @@ namespace SPCommon.CAML
             Func<Stack<string>, string> process = null;
             process = stack =>
             {
+                // Pop the first two statements, combine then with the condition operator.
+                // If only one item left, entire statement chain has been processed, so retur the result
                 if (stack.Count == 0) return string.Empty;
                 if (stack.Count == 1) return stack.Pop();
                 var statement1 = stack.Pop();
@@ -88,17 +81,6 @@ namespace SPCommon.CAML
             };
 
             return process(statementStack);
-
-        }
-
-        private static string GetConditionExpression(CAMLConditionExpression conditionExpression)
-        {
-            var condition = conditionExpression.Condition.ToString();
-            var expression = String.Format(@"<{0}>{1}{2}</{0}>",
-                                        condition,
-                                        GetSingleExpression(conditionExpression.Left),
-                                        GetSingleExpression(conditionExpression.Right));
-            return expression;
         }
 
         private static string GetSingleExpression(CAMLExpression expression)

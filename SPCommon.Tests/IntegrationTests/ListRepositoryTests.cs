@@ -113,7 +113,7 @@ namespace SPCommon.Tests.IntegrationTests
         }
 
         [TestMethod]
-        public void ListRepository_FindItemsByCAML()
+        public void ListRepository_FindItemsByCAML_SingleExpression()
         {
             ResetList();
 

@@ -20,15 +20,6 @@ namespace SPCommon.Tests.UnitTests
 
 
         [TestMethod]
-        public void CAMLBuilder_ConditionExpression()
-        {
-            var expression = GetConditionExpression();
-            var builder = new CAMLBuilder(expression);
-            var checkString = GetConditionCheckString(expression);
-            Assert.IsTrue(builder.ToString().Equals(checkString));
-        }
-
-        [TestMethod]
         public void CAMLBuilder_Chained_1_Expression()
         {
             var expression = GetSinglExpression();
@@ -52,7 +43,9 @@ namespace SPCommon.Tests.UnitTests
                 Expressions = new List<CAMLExpression> { expression, expression }
             };
             var builder = new CAMLBuilder(chain);
-            var checkString = GetConditionCheckString(GetConditionExpression() as CAMLConditionExpression);
+            var checkString = String.Format(@"<Where><{0}>{1}{1}</{0}></Where>",
+                                chain.Condition,
+                                GetSingleString(expression));
             Assert.IsTrue(builder.ToString().Equals(checkString));
         }
 
@@ -72,25 +65,6 @@ namespace SPCommon.Tests.UnitTests
 
         
         #region Private helper
-
-        private static ICAMLExpression GetConditionExpression()
-        {
-            return new CAMLConditionExpression
-            {
-                Left = GetSinglExpression() as CAMLExpression,
-                Right = GetSinglExpression() as CAMLExpression,
-                Condition = CAMLCondition.And
-            };
-        }
-
-        private static string GetConditionCheckString(ICAMLExpression caml)
-        {
-            var expression = caml as CAMLConditionExpression;
-            return String.Format(@"<Where><{0}>{1}{2}</{0}></Where>",
-                                expression.Condition,
-                                GetSingleString(expression.Left),
-                                GetSingleString(expression.Right));
-        }
 
         private string GetThreeChainString(CAMLChainedExpression chain)
         {
