@@ -61,6 +61,7 @@ namespace SPCommon.Tests.UnitTests
         private readonly string _rawValue;
         private readonly string _contentType;
         private const string Delimiter = ";#";
+        // a comment
 
         public TemplateParser(string rawVaue, string contentType)
         {
