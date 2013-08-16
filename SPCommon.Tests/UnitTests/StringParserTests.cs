@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.SharePoint.Applications.GroupBoard.WebPartPages;
+using Microsoft.SharePoint.BusinessData.Administration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SPCommon.Tests.UnitTests
@@ -18,21 +19,21 @@ namespace SPCommon.Tests.UnitTests
         private const string BidCT = "BID";
 
         [TestMethod]
-        public void TemplateParser_ExtractSingleTemplateTitle()
+        public void TemplateParser_ReturnSingleValueForSingleValue()
         {
             var parser = new TemplateParser(SingleValue, ItemCT);
             Assert.IsTrue(parser.ToString().Equals(SingleValue));
         }
 
         [TestMethod]
-        public void TemplateParser_ExtractSingleValueBasedOnContentType()
+        public void TemplateParser_ReturnValueForMultiValueOneValue()
         {
             var parser = new TemplateParser(CtValue, ItemCT);
             Assert.IsTrue(parser.ToString().Equals("Test Site V1.0"));
         }
 
         [TestMethod]
-        public void TemplateParser_ExtractValueForMultipleTemplates()
+        public void TemplateParser_ReturnValueForMultiValueMulitpleValues()
         {
             var parser = new TemplateParser(MultiValue, ItemCT);
             Assert.IsTrue(parser.ToString().Equals("Test Site V1.0"));
@@ -42,21 +43,43 @@ namespace SPCommon.Tests.UnitTests
         }
 
         [TestMethod]
-        public void TemplateParser_ExtractValueForNonExistentContentType()
+        public void TemplateParser_ReturnsRawValueForNonExistentContentType()
         {
             var parser = new TemplateParser(MultiValue, "document");
             Assert.IsTrue(parser.ToString().Equals(MultiValue));
         }
 
         [TestMethod]
-        public void TemplateParser_ExtractValueForNullValue()
+        public void TemplateParser_ReturnNullForNullRawValue()
         {
             var parser = new TemplateParser(null, "document");
             Assert.IsTrue(string.IsNullOrEmpty(parser.ToString()));
         }
+
+        [TestMethod]
+        public void TemplateParser_ReturnEmptyForEmptyRawValue()
+        {
+            var parser = new TemplateParser(string.Empty, "document");
+            Assert.IsTrue(string.IsNullOrEmpty(parser.ToString()));
+        }
+
+        [TestMethod]
+        public void TemplateParser_ReturnRawValueForNullContentType()
+        {
+            var parser = new TemplateParser(MultiValue, null);
+            Assert.IsTrue(parser.ToString().Equals(MultiValue));
+
+            parser = new TemplateParser(SingleValue, null);
+            Assert.IsTrue(parser.ToString().Equals(SingleValue));
+        }
     }
 
-    class TemplateParser
+    /// <summary>
+    /// Takes in the raw value for the 'TemplateTitle' column and matches it against the content type provided.
+    /// If match found, returns the value
+    /// Otherwise, returns the original TemplateTItle value
+    /// </summary>
+    public class TemplateParser
     {
         private readonly string _rawValue;
         private readonly string _contentType;
@@ -81,13 +104,13 @@ namespace SPCommon.Tests.UnitTests
 
         private string GetTemplateTitle()
         {
-            // For single value template titles, it will just be the template title, i.e. it will not follow the format
-            // This will also ensure backward compatibility
+            // For single value template titles, it will just be the template title, i.e. it will not follow the format, e.g. "Bid Site V1.0"
+            // This ensures backward compatibility
             if (!_rawValue.StartsWith("["))
                 return _rawValue;
             foreach (var template in GetTemplates())
             {
-                // Match [type:value]
+                // Match "[type:value]"
                 var regex = new Regex("\\[(?<type>.*):(?<value>.*)\\]");
                 var matchCollection = regex.Matches(template);
                 foreach (Match match in matchCollection)
