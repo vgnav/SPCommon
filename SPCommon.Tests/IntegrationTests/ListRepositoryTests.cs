@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.JSGrid;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SPCommon.Entity;
@@ -29,11 +31,6 @@ namespace SPCommon.Tests.IntegrationTests
             Assert.IsTrue(_listRepository.FindAll().Count == (initialCount + 1));
             Assert.IsTrue(_listRepository.Delete(testEntity));
             Assert.IsTrue(_listRepository.FindAll().Count == initialCount);
-        }
-
-        private static TestEntity GetTestEntity()
-        {
-            return new TestEntity {Title = "GetItemTest"};
         }
 
         [TestMethod]
@@ -83,6 +80,63 @@ namespace SPCommon.Tests.IntegrationTests
             Assert.IsTrue(success);
             Assert.IsTrue(_listRepository.FindAll().Count == initialCount);
         }
+
+        [TestMethod]
+        public void ListRepository_FindItemsByQuery()
+        {
+            ResetList();
+
+            var item1 = GetTestEntity();
+            var item2 = GetTestEntity();
+            var item3 = GetTestEntity();
+            var item4 = GetTestEntity();
+            var item5 = GetTestEntity();
+
+            _listRepository.Create(item1);
+            _listRepository.Create(item2);
+            _listRepository.Create(item3);
+            _listRepository.Create(item4);
+            _listRepository.Create(item5);
+
+            var spquery = new SPQuery
+            {
+                // TODO: CAML query builder
+                Query = "<Where><Eq><FieldRef Name=\"Title\" /><Value Type=\"Text\">" + item1.Title +"</Value></Eq></Where>"
+            };
+
+            var items = _listRepository.FindByQuery(spquery);
+            var count = items.Count;
+
+            Assert.IsTrue(count == 5);
+
+            ResetList();
+        }
+
+        #region helpers
+
+        private static TestEntity GetTestEntity()
+        {
+            return new TestEntity { Title = "GetItemTest" };
+        }
+
+        // Delete everything
+        private static void ResetList()
+        {
+            using (var site = new SPSite(ListUrl))
+            {
+                using (var web = site.OpenWeb())
+                {
+                    var list = web.Lists.TryGetList(ListName);
+                    var items = list.Items;
+                    foreach (SPListItem item in items)
+                    {
+                        list.Items.DeleteItemById(item.ID);
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 
     public class TestEntity : BaseListItem

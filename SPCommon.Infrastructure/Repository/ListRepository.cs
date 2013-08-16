@@ -127,14 +127,13 @@ namespace SPCommon.Infrastructure.Repository
         public IList<T> FindByQuery(object query)
         {
             var returnedList = new List<T>();
-            var spquery = query as SPQuery;
             if (Web == null)
             {
-                Helper.Instance.OpenWeb(ListUrl, web => { returnedList = GetAllItems(web, spquery); });
+                Helper.Instance.OpenWeb(ListUrl, web => { returnedList = GetAllItems(web, query as SPQuery); });
             }
             else
             {
-                returnedList = GetAllItems(Web, spquery);
+                returnedList = GetAllItems(Web, query as SPQuery);
             }
             return returnedList;
         }
