@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.SharePoint;
 using SPCommon.Entity;
-using SPCommon.Infrastructure.Repository;
+using SPCommon.Infrastructure.Factory;
 using SPCommon.Interface;
 
 namespace SPCommon.Infrastructure.Cache
@@ -12,14 +12,12 @@ namespace SPCommon.Infrastructure.Cache
 
         protected ICacheProvider<T> CacheProvider { get; set; }
         protected IRepository<T> Repository { get; set; }
-        protected ICacheConfiguration Configuration { get; set; }
 
         public RepositoryCacheService(ICacheConfiguration configuration)
         {
-            Configuration = configuration;
-            // Going against DI here, but for flexibility's sakes, we do some object construction here
-            CacheProvider = new IISCacheProvider<T>(Configuration);
-            Repository = new GenericListRepository<T>(Configuration.Context as SPWeb, Configuration.ListName);
+            // Going against DI here, but for flexibility's sakes we do some object construction
+            CacheProvider = new IISCacheProvider<T>(configuration);
+            Repository = ListRepositoryFactory.Instance.GetRepository<T>(configuration.ListName, configuration.Context as SPWeb);
         }
 
         public RepositoryCacheService(IRepository<T> repository, ICacheConfiguration configuration) : this(configuration)
@@ -27,10 +25,10 @@ namespace SPCommon.Infrastructure.Cache
             Repository = repository;
         }
 
-        public RepositoryCacheService(ICacheProvider<T> cacheProvider, IRepository<T> repository,
-            ICacheConfiguration configuration) : this(repository, configuration)
+        public RepositoryCacheService(IRepository<T> repository, ICacheProvider<T> cacheProvider)
         {
             CacheProvider = cacheProvider;
+            Repository = repository;
         }
 
         #endregion
@@ -64,12 +62,38 @@ namespace SPCommon.Infrastructure.Cache
 
         public virtual IList<T> GetItemsFromRepository()
         {
-            return Configuration.Query == null ? Repository.FindAll() : Repository.FindByQuery(Configuration.Query);
+            return CacheProvider.Configuration.Query == null ? Repository.FindAll() : Repository.FindByQuery(CacheProvider.Configuration.Query);
         }
 
         public virtual T GetSingleItemFromRepository()
         {
-            return Repository.Read(Configuration.SingleItemId);
+            return Repository.Read(CacheProvider.Configuration.SingleItemId);
+        }
+    }
+
+    public class CacheSettings : ICacheConfiguration
+    {
+        public string Key { get; set; }
+        public object Query { get; set; }
+        public int SingleItemId { get; set; }
+        public object Context { get; set; }
+        public string ListName { get; set; }
+    }
+
+    class Client
+    {
+        void Method()
+        {
+            var cacheSettings = new CacheSettings
+            {
+                ListName = "Test",
+                Query = null,
+                Context = SPContext.Current.Web,
+                Key = "something",                
+            };
+            var cache = new RepositoryCacheService<BaseListItem>(cacheSettings);
+            var items = cache.GetItems();
+            
         }
     }
     

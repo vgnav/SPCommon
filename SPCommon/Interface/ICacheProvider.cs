@@ -10,5 +10,6 @@ namespace SPCommon.Interface
         void Refresh();
         T GetSingleItem();
         T InsertSingleItem(T item);
+        ICacheConfiguration Configuration { get; }
     }
 }

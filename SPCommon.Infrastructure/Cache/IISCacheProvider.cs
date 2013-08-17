@@ -9,11 +9,11 @@ namespace SPCommon.Infrastructure.Cache
     /// <typeparam name="T"></typeparam>
     public class IISCacheProvider<T> : ICacheProvider<T> where T : class
     {
-        private readonly ICacheConfiguration _configuration;
+        public ICacheConfiguration Configuration { get; private set; }
 
         public IISCacheProvider(ICacheConfiguration configuration)
         {
-            _configuration = configuration;
+            Configuration = configuration;
         }
 
         public bool IsInCache()
