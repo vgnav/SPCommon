@@ -40,14 +40,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CAML\CAMLBuilder.cs" />
-    <Compile Include="Entity\BaseDocument.cs" />
-    <Compile Include="Entity\BaseListItem.cs" />
+    <Compile Include="Entity\BaseItem.cs" />
     <Compile Include="CustomException\BaseException.cs" />
     <Compile Include="CustomException\ListNotFoundException.cs" />
+    <Compile Include="Cache\CacheSettings.cs" />
     <Compile Include="Entity\DataTypes\HyperLink.cs" />
     <Compile Include="Entity\DataTypes\PublishingImage.cs" />
     <Compile Include="Entity\DataTypes\TaxonomyValue.cs" />
-    <Compile Include="Interface\ICacheConfiguration.cs" />
+    <Compile Include="Interface\ICacheSettings.cs" />
     <Compile Include="Interface\ICacheProvider.cs" />
     <Compile Include="Interface\ICAMLExpression.cs" />
     <Compile Include="Interface\IDocumentRepository.cs" />

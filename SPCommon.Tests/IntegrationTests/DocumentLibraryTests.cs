@@ -1,12 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.JSGrid;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SPCommon.Entity;
 using SPCommon.Infrastructure.Factory;
-using SPCommon.Infrastructure.Repository;
 using SPCommon.Interface;
 
 namespace SPCommon.Tests.IntegrationTests
@@ -26,7 +22,7 @@ namespace SPCommon.Tests.IntegrationTests
         {
             _site = new SPSite(LibUrl);
             _web = _site.OpenWeb();
-            _documentRepository = DocumentRepositoryFactory.Instance.GetRepository<TestDocument>(LibName, _web); 
+            _documentRepository = RepositoryFactory.Instance.Get<IDocumentRepository<TestDocument>, TestDocument>(_web, LibName);
         }
 
         [TestCleanup]
@@ -172,7 +168,7 @@ namespace SPCommon.Tests.IntegrationTests
         #endregion
     }
 
-    internal class TestDocument : BaseDocument
+    internal class TestDocument : BaseItem
     {
         public string Name { get; set; }
     }

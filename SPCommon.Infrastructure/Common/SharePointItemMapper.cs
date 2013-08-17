@@ -10,7 +10,7 @@ using SPCommon.Entity.DataTypes;
 
 namespace SPCommon.Infrastructure.Common
 {
-    internal class SharePointItemMapper<T> where T : BaseListItem, new()
+    internal class SharePointItemMapper<T> where T : BaseItem, new()
     {
         public T BuildEntityFromItem(SPListItem item)
         {

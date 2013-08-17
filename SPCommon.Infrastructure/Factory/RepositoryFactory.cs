@@ -7,69 +7,36 @@ using SPCommon.Interface;
 
 namespace SPCommon.Infrastructure.Factory
 {
-
-    public class ListRepositoryFactory
+    public class RepositoryFactory
     {
-        private static ListRepositoryFactory _instance;
-        public static ListRepositoryFactory Instance
+        private static RepositoryFactory _instance;
+        public static RepositoryFactory Instance
         {
-            get { return _instance ?? (_instance = new ListRepositoryFactory()); }
+            get { return _instance ?? (_instance = new RepositoryFactory()); }
         }
 
-        public IListRepository<T> GetRepository<T>(string listName) where T : BaseListItem, new()
+        public TRepository Get<TRepository, T>(SPWeb web, string listName) where TRepository : IRepository<T>
+            where T : BaseItem, new()
         {
-            if(SPContext.Current == null || SPContext.Current.Web == null)
-                throw new NullReferenceException("SPContext.Current or SPContext.Current.Web is null");
-            return GetRepository<T>(listName, SPContext.Current.Web);
+            var dictionary = ProvideRepositories<T>(web);
+            if (dictionary.ContainsKey(listName)) return (TRepository) dictionary[listName];
+            
+            var repositoryType = typeof (TRepository);
+            if (repositoryType == typeof (IListRepository<T>))
+            {
+                return (TRepository) (new GenericListRepository<T>(web, listName) as IRepository<T>);
+            }
+            if (repositoryType == typeof(IDocumentRepository<T>))
+            {
+                return (TRepository)(new GenericDocumentRepository<T>(web, listName) as IRepository<T>);
+            }
+            throw new Exception("Cannot create a repository with the parameters provided");
         }
 
-        public IListRepository<T> GetRepository<T>(string listName, SPWeb web) where T : BaseListItem, new()
+        public virtual Dictionary<string, IRepository<T>> ProvideRepositories<T>(SPWeb web) where T : BaseItem, new()
         {
-            // Search for a specific repository with the listname. If not found, then return generic repository
-            var availableRepositories = ProvideRepositories<T>(web);
-            return availableRepositories.ContainsKey(listName) ? 
-                    availableRepositories[listName] : new GenericListRepository<T>(web, listName);
-        }
-
-        /// <summary>
-        /// Clients should override this and provide a dictionary of ListRepositories such that the ListName maps to the repository type
-        /// For example, list type "Tasks" should map to TaskRepository with the TaskItem type
-        /// </summary>
-        /// <param name="web"></param>
-        /// <returns></returns>
-        public virtual Dictionary<string, IListRepository<T>> ProvideRepositories<T>(SPWeb web) where T : BaseListItem, new()
-        {
-            return new Dictionary<string, IListRepository<T>>();
+            return new Dictionary<string, IRepository<T>>();
         }
     }
 
-    public class DocumentRepositoryFactory
-    {
-        private static DocumentRepositoryFactory _instance;
-        public static DocumentRepositoryFactory Instance
-        {
-            get { return _instance ?? (_instance = new DocumentRepositoryFactory()); }
-        }
-
-        public IDocumentRepository<T> GetRepository<T>(string libraryName) where T : BaseDocument, new()
-        {
-            if (SPContext.Current == null || SPContext.Current.Web == null)
-                throw new NullReferenceException("SPContext.Current or SPContext.Current.Web is null");
-            return GetRepository<T>(libraryName, SPContext.Current.Web);
-        }
-
-        public IDocumentRepository<T> GetRepository<T>(string libraryName, SPWeb web) where T : BaseDocument, new()
-        {
-            // Search for a specific repository with the library name. If not found, then return generic repository
-            var availableRepositories = ProvideRepositories<T>();
-            return availableRepositories.ContainsKey(libraryName) ? 
-                    availableRepositories[libraryName] : new GenericDocumentRepository<T>(web, libraryName);
-        }
-
-        // Overridable method
-        public virtual Dictionary<string, IDocumentRepository<T>> ProvideRepositories<T>() where T : BaseDocument, new()
-        {
-            return new Dictionary<string, IDocumentRepository<T>>();
-        }
-    }
 }

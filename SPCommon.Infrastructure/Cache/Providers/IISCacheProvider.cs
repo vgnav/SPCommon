@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SPCommon.Interface;
 
-namespace SPCommon.Infrastructure.Cache
+namespace SPCommon.Infrastructure.Cache.Providers
 {
     /// <summary>
     /// TODO: Implement
@@ -9,11 +9,11 @@ namespace SPCommon.Infrastructure.Cache
     /// <typeparam name="T"></typeparam>
     public class IISCacheProvider<T> : ICacheProvider<T> where T : class
     {
-        public ICacheConfiguration Configuration { get; private set; }
+        public ICacheSettings Settings { get; private set; }
 
-        public IISCacheProvider(ICacheConfiguration configuration)
+        public IISCacheProvider(ICacheSettings settings)
         {
-            Configuration = configuration;
+            Settings = settings;
         }
 
         public bool IsInCache()

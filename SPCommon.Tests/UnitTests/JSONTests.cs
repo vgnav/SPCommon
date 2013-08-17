@@ -11,7 +11,7 @@ namespace SPCommon.Tests.UnitTests
         [TestMethod]
         public void JSON_SerializeObjectToJSON()
         {
-            var baseItem = new BaseListItem
+            var baseItem = new BaseItem
             {
                 Author = "Navid"
             };
@@ -24,16 +24,16 @@ namespace SPCommon.Tests.UnitTests
         {
             var jsonList = new JSONList
             {
-                new BaseListItem {Author = "Navid"},
-                new BaseListItem {Author = "Preety"},
-                new BaseListItem {Author = "One"},
-                new BaseDocument {Author = "Two"}
+                new BaseItem {Author = "Navid"},
+                new BaseItem {Author = "Preety"},
+                new BaseItem {Author = "One"},
+                new BaseItem {Author = "Two"}
             };
 
-            var list = new List<BaseListItem>
+            var list = new List<BaseItem>
             {
-                new BaseListItem {Author = "Navid"},
-                new BaseListItem {Author = "Preety"},
+                new BaseItem {Author = "Navid"},
+                new BaseItem {Author = "Preety"},
             };
 
             var jsonList2 = JSONList.ToJSONList(list);

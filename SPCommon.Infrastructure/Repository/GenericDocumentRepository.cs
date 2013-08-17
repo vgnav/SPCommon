@@ -1,6 +1,5 @@
 ﻿using Microsoft.SharePoint;
 using SPCommon.Entity;
-using SPCommon.Infrastructure.Common;
 using SPCommon.Interface;
 
 namespace SPCommon.Infrastructure.Repository
@@ -10,7 +9,7 @@ namespace SPCommon.Infrastructure.Repository
     /// check-in/check-out, file-reads, file-uploads, etc.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class GenericDocumentRepository<T> : GenericListRepository<T>, IDocumentRepository<T> where T : BaseDocument, new()
+    public class GenericDocumentRepository<T> : GenericListRepository<T>, IDocumentRepository<T> where T : BaseItem, new()
     {
         #region Constructors and private/protected variables
         
@@ -58,7 +57,7 @@ namespace SPCommon.Infrastructure.Repository
             var fileUrl = web.Url + "/" + folder.Url + "/" + item.FileName;
             if (web.GetFile(fileUrl).Exists) return false; // file exists, return with false
             var file = folder.Files.Add(fileUrl, item.FileData);
-            // GetRepository the list item from the uploaded file
+            // GetRepositoryFor the list item from the uploaded file
             var spListItem = file.Item;
             // Do any extra mapping required
             MapEntityItemToSPListItem(item, spListItem);

@@ -1,26 +1,27 @@
 ﻿using System.Collections.Generic;
 using Microsoft.SharePoint;
 using SPCommon.Entity;
+using SPCommon.Infrastructure.Cache.Providers;
 using SPCommon.Infrastructure.Factory;
 using SPCommon.Interface;
 
 namespace SPCommon.Infrastructure.Cache
 {
-    public class RepositoryCacheService<T> where T : BaseListItem, new()
+    public class RepositoryCacheService<T> where T : BaseItem, new()
     {
         #region Properties and constructors
 
         protected ICacheProvider<T> CacheProvider { get; set; }
         protected IRepository<T> Repository { get; set; }
 
-        public RepositoryCacheService(ICacheConfiguration configuration)
+        public RepositoryCacheService(ICacheSettings settings)
         {
-            // Going against DI here, but for flexibility's sakes we do some object construction
-            CacheProvider = new IISCacheProvider<T>(configuration);
-            Repository = ListRepositoryFactory.Instance.GetRepository<T>(configuration.ListName, configuration.Context as SPWeb);
+            // Going against DI here, but for flexibility's sakes we create the default cache provider and repository
+            CacheProvider = new IISCacheProvider<T>(settings);
+            Repository = RepositoryFactory.Instance.Get<IListRepository<T>, T>(settings.Context as SPWeb, settings.ListName);
         }
 
-        public RepositoryCacheService(IRepository<T> repository, ICacheConfiguration configuration) : this(configuration)
+        public RepositoryCacheService(IRepository<T> repository, ICacheSettings settings) : this(settings)
         {
             Repository = repository;
         }
@@ -62,39 +63,12 @@ namespace SPCommon.Infrastructure.Cache
 
         public virtual IList<T> GetItemsFromRepository()
         {
-            return CacheProvider.Configuration.Query == null ? Repository.FindAll() : Repository.FindByQuery(CacheProvider.Configuration.Query);
+            return CacheProvider.Settings.Query == null ? Repository.FindAll() : Repository.FindByQuery(CacheProvider.Settings.Query);
         }
 
         public virtual T GetSingleItemFromRepository()
         {
-            return Repository.Read(CacheProvider.Configuration.SingleItemId);
+            return Repository.Read(CacheProvider.Settings.SingleItemId);
         }
     }
-
-    public class CacheSettings : ICacheConfiguration
-    {
-        public string Key { get; set; }
-        public object Query { get; set; }
-        public int SingleItemId { get; set; }
-        public object Context { get; set; }
-        public string ListName { get; set; }
-    }
-
-    class Client
-    {
-        void Method()
-        {
-            var cacheSettings = new CacheSettings
-            {
-                ListName = "Test",
-                Query = null,
-                Context = SPContext.Current.Web,
-                Key = "something",                
-            };
-            var cache = new RepositoryCacheService<BaseListItem>(cacheSettings);
-            var items = cache.GetItems();
-            
-        }
-    }
-    
 }

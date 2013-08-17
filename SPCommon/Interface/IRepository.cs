@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using SPCommon.Entity;
 
 namespace SPCommon.Interface
 {
-    public interface IRepository<T> where T : BaseListItem, new()
+    public interface IRepository<T> where T : class, new()
     {
         bool Create(T t);
         T Read(int id);

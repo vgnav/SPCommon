@@ -22,7 +22,7 @@ namespace SPCommon.Tests.IntegrationTests
         {
             _site = new SPSite(ListUrl);
             _web = _site.OpenWeb();
-            _listRepository = ClientFactory.Instance.GetRepository<TestEntity>("Test", _web);
+            _listRepository = ClientFactory.Instance.Get<IListRepository<TestEntity>, TestEntity>(_web, ListName);
         }
 
         [TestCleanup]
@@ -186,7 +186,7 @@ namespace SPCommon.Tests.IntegrationTests
         #endregion
     }
 
-    public class TestEntity : BaseListItem
+    public class TestEntity : BaseItem
     {
         public string TextColumn { get; set; }
         public bool YesNoColumn { get; set; }
@@ -205,7 +205,7 @@ namespace SPCommon.Tests.IntegrationTests
         }
     }
 
-    public class ClientFactory : ListRepositoryFactory
+    public class ClientFactory : RepositoryFactory
     {
         private ClientFactory(){}
         private static ClientFactory _instance;
@@ -214,10 +214,10 @@ namespace SPCommon.Tests.IntegrationTests
             get { return _instance ?? (_instance = new ClientFactory()); }
         }
 
-        public override Dictionary<string, IListRepository<T>> ProvideRepositories<T>(SPWeb web)
+        public override Dictionary<string, IRepository<T>> ProvideRepositories<T>(SPWeb web)
         {
             var repositories = base.ProvideRepositories<T>(web);
-            repositories.Add("Test", (IListRepository<T>) new TestRepository(web));
+            repositories.Add("Test", (IRepository<T>) new TestRepository(web));
             return repositories;
         }
     }

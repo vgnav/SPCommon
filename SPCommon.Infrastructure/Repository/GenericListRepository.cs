@@ -17,7 +17,7 @@ namespace SPCommon.Infrastructure.Repository
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class GenericListRepository<T> : IListRepository<T> where T : BaseListItem, new()
+    public class GenericListRepository<T> : IListRepository<T> where T : BaseItem, new()
     {
         #region Constructors, method-based initialisers and private/protected variables
 

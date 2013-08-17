@@ -18,7 +18,7 @@ namespace SPCommon.ConsoleApp
         }
     }
 
-    public class TestEntity : BaseListItem
+    public class TestEntity : BaseItem
     {
         public string TextColumn { get; set; }
         public bool YesNoColumn { get; set; }

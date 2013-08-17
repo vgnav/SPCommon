@@ -1,6 +1,6 @@
 ﻿namespace SPCommon.Interface
 {
-    public interface ICacheConfiguration
+    public interface ICacheSettings
     {
         string Key { get; set; }
         object Query { get; set; }
