@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SPCommon.CAML;
 using SPCommon.Entity;
+using SPCommon.Infrastructure.Factory;
 using SPCommon.Infrastructure.Repository;
 using SPCommon.Interface;
 
@@ -20,12 +20,9 @@ namespace SPCommon.Tests.IntegrationTests
         
         public ListRepositoryTests()
         {
-            //_listRepository =
-            //    (new ListFactory<TestEntity>(ListUrl, ListName)).GetRepository("List") as IListRepository<TestEntity>;
-            // _listRepository = new TestRepository<TestEntity>(ListUrl);
-            var _site = new SPSite(ListUrl);
-            var _web = _site.OpenWeb();
-            _listRepository = new GenericListRepository<TestEntity>(_web, ListName);
+            _site = new SPSite(ListUrl);
+            _web = _site.OpenWeb();
+            _listRepository = ClientFactory.Instance.GetRepository<TestEntity>("Test", _web);
         }
 
         [TestCleanup]
@@ -34,6 +31,8 @@ namespace SPCommon.Tests.IntegrationTests
             _web.Dispose();
             _site.Dispose();
         }
+
+        #region Test Methods
 
         [TestMethod]
         public void ListRepository_GetAllItems()
@@ -158,6 +157,8 @@ namespace SPCommon.Tests.IntegrationTests
             ResetList();
         }
 
+        #endregion
+
         #region helpers
 
         private static TestEntity GetTestEntity()
@@ -191,18 +192,33 @@ namespace SPCommon.Tests.IntegrationTests
         public bool YesNoColumn { get; set; }
     }
 
-    public class TestRepository<T> : GenericListRepository<T> where T : TestEntity, new()
+    public class TestRepository : GenericListRepository<TestEntity>
     {
-        private const string ListTitle = "Test";
-        
         public TestRepository(SPWeb web)
-            : base(web, ListTitle)
+            : base(web, "Test")
         {}
 
-        public override void MapEntityItemToSPListItem(T item, SPListItem spListItem)
+        public override void MapEntityItemToSPListItem(TestEntity item, SPListItem spListItem)
         {
             base.MapEntityItemToSPListItem(item, spListItem);
-            spListItem["YesNoColumn"] = item.YesNoColumn ? "True" : "False";
+            spListItem["YesNoColumn"] = item.YesNoColumn ? "1" : "0";
+        }
+    }
+
+    public class ClientFactory : ListRepositoryFactory
+    {
+        private ClientFactory(){}
+        private static ClientFactory _instance;
+        public new static ClientFactory Instance
+        {
+            get { return _instance ?? (_instance = new ClientFactory()); }
+        }
+
+        public override Dictionary<string, IListRepository<T>> ProvideRepositories<T>(SPWeb web)
+        {
+            var repositories = base.ProvideRepositories<T>(web);
+            repositories.Add("Test", (IListRepository<T>) new TestRepository(web));
+            return repositories;
         }
     }
 

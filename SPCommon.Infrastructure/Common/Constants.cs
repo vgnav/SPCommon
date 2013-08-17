@@ -9,7 +9,7 @@
 
         }
 
-        public static class Repositories
+        public static class RepositorType
         {
             public const string GenericListRepository = "List";
             public const string GenericDocumentLibrary = "Document";

@@ -58,7 +58,7 @@ namespace SPCommon.Infrastructure.Repository
             var fileUrl = web.Url + "/" + folder.Url + "/" + item.FileName;
             if (web.GetFile(fileUrl).Exists) return false; // file exists, return with false
             var file = folder.Files.Add(fileUrl, item.FileData);
-            // Get the list item from the uploaded file
+            // GetRepository the list item from the uploaded file
             var spListItem = file.Item;
             // Do any extra mapping required
             MapEntityItemToSPListItem(item, spListItem);

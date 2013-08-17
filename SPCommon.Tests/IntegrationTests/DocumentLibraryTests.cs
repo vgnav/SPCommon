@@ -5,6 +5,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.JSGrid;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SPCommon.Entity;
+using SPCommon.Infrastructure.Factory;
 using SPCommon.Infrastructure.Repository;
 using SPCommon.Interface;
 
@@ -23,9 +24,9 @@ namespace SPCommon.Tests.IntegrationTests
 
         public DocumentLibraryTests()
         {
-            var _site = new SPSite(LibUrl);
-            var _web = _site.OpenWeb();
-            _documentRepository = new GenericDocumentRepository<TestDocument>(_web, LibName);
+            _site = new SPSite(LibUrl);
+            _web = _site.OpenWeb();
+            _documentRepository = DocumentRepositoryFactory.Instance.GetRepository<TestDocument>(LibName, _web); 
         }
 
         [TestCleanup]
