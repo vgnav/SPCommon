@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\IISCacheProvider.cs" />
+    <Compile Include="Cache\RepositoryCacheService.cs" />
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Common\Helper.cs" />
     <Compile Include="Common\SPLogger.cs" />

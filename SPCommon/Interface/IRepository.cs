@@ -10,5 +10,6 @@ namespace SPCommon.Interface
         bool Update(T t);
         bool Delete(T t);
         IList<T> FindAll();
+        IList<T> FindByQuery(object query);
     }
 }
