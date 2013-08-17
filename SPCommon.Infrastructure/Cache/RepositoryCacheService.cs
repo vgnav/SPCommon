@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.SharePoint;
 using SPCommon.Entity;
+using SPCommon.Infrastructure.Repository;
 using SPCommon.Interface;
 
 namespace SPCommon.Infrastructure.Cache
@@ -16,7 +17,9 @@ namespace SPCommon.Infrastructure.Cache
         public RepositoryCacheService(ICacheConfiguration configuration)
         {
             Configuration = configuration;
+            // Going against DI here, but for flexibility's sakes, we do some object construction here
             CacheProvider = new IISCacheProvider<T>(Configuration);
+            Repository = new GenericListRepository<T>(Configuration.Context as SPWeb, Configuration.ListName);
         }
 
         public RepositoryCacheService(IRepository<T> repository, ICacheConfiguration configuration) : this(configuration)
