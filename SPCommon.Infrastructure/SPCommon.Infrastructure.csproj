@@ -49,6 +49,7 @@
     <Compile Include="Common\SPLogger.cs" />
     <Compile Include="Common\SharePointItemMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository\CachedListRepository.cs" />
     <Compile Include="Repository\GenericDocumentRepository.cs" />
     <Compile Include="Repository\GenericListRepository.cs" />
     <Compile Include="Factory\RepositoryFactory.cs" />
