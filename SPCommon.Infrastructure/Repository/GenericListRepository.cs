@@ -10,55 +10,26 @@ using SPCommon.Interface;
 namespace SPCommon.Infrastructure.Repository
 {
     /// <summary>
-    /// ListRepository needs to be used with a class whose type has been derived from SPCommon.Entity.BaseListItem
-    /// If used with SharePoint ServiceLocator, use the appropriate 'Initialise' method otherwise it will not work
-    /// ListRepositoy is designed to work with dependency injection and completely stand-alone.  
-    /// For Dependency Injection, initialise/construct with your SPWeb value (usually coming from SPContext.Current.Web)
-    /// For stand-alone, pass the URL of the list
+    /// GenericListRepository needs to be used with a class whose type has been derived from SPCommon.Entity.BaseListItem
+    /// ListRepositoy is designed to work with dependency injection
+    /// Initialise/construct with your SPWeb value (usually coming from SPContext.Current.Web)
     /// ListName is compulsory (otherwise it won't work, obviously)
     /// 
-    /// Note: ListRepository DOES NOT open the web using elevated priveleges; to do this, call ListRepository from your own elevated context
-    /// Similarly for SPWebs with 'AllowUnsafeUpdates' allowed; to support this, create your own SPWeb object, set the AllowUnsafeUpdates to true, and then pass the web into the initialiser/constructor
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ListRepository<T> : IListRepository<T> where T : BaseListItem, new()
+    public class GenericListRepository<T> : IListRepository<T> where T : BaseListItem, new()
     {
         #region Constructors, method-based initialisers and private/protected variables
 
-        protected string ListUrl;
         protected string ListName;
         protected SPWeb Web;
 
-        /// <summary>
-        /// Empty constructor required for SharePoint ServiceLocator
-        /// </summary>
-        public ListRepository()
-        {
-        }
-
-        public ListRepository(string listUrl, string listName)
-        {
-            ListUrl = listUrl;
-            ListName = listName;
-        }
-
-        public ListRepository(SPWeb web, string listName)
+        public GenericListRepository(SPWeb web, string listName)
         {
             Web = web;
             ListName = listName;
         }
 
-        public void Initialise(string listUrl, string listName)
-        {
-            ListUrl = listUrl;
-            ListName = listName;
-        }
-
-        public void Initialise(SPWeb web, string listName)
-        {
-            Web = web;
-            ListName = listName;
-        }
 
         #endregion
 
@@ -66,58 +37,22 @@ namespace SPCommon.Infrastructure.Repository
 
         public bool Create(T t)
         {
-            var success = false;
-            if (Web == null)
-            {
-                Helper.Instance.OpenWeb(ListUrl, web => { success = CreateItem(web, t); });
-            }
-            else
-            {
-                success = CreateItem(Web, t);
-            }
-            return success;
+            return CreateItem(Web, t);
         }
 
         public T Read(int id)
         {
-            var item = new T();
-            if (Web == null)
-            {
-                Helper.Instance.OpenWeb(ListUrl, web => { item = GetSingleItem(web, id); });
-            }
-            else
-            {
-                return GetSingleItem(Web, id);
-            }
-            return item;
+            return GetSingleItem(Web, id);
         }
 
         public bool Update(T t)
         {
-            var success = false;
-            if (Web == null)
-            {
-                Helper.Instance.OpenWeb(ListUrl, web => { success = UpdateItem(web, t); });
-            }
-            else
-            {
-                success = UpdateItem(Web, t);
-            }
-            return success;
+            return UpdateItem(Web, t);
         }
 
         public bool Delete(T t)
         {
-            var success = false;
-            if (Web == null)
-            {
-                Helper.Instance.OpenWeb(ListUrl, web => { success = DeleteItem(web, t); });
-            }
-            else
-            {
-                success = DeleteItem(Web, t);
-            }
-            return success;
+            return DeleteItem(Web, t);
         }
 
         public IList<T> FindAll()
@@ -127,15 +62,7 @@ namespace SPCommon.Infrastructure.Repository
 
         public IList<T> FindByQuery(object query)
         {
-            var returnedList = new List<T>();
-            if (Web == null)
-            {
-                Helper.Instance.OpenWeb(ListUrl, web => { returnedList = GetAllItems(web, query as SPQuery); });
-            }
-            else
-            {
-                returnedList = GetAllItems(Web, query as SPQuery);
-            }
+            var returnedList = GetAllItems(Web, query as SPQuery);
             return returnedList;
         }
 
@@ -159,7 +86,7 @@ namespace SPCommon.Infrastructure.Repository
         /// </summary>
         /// <param name="item"></param>
         /// <param name="spListItem"></param>
-        protected virtual void MapEntityItemToSPListItem(T item, SPListItem spListItem)
+        public virtual void MapEntityItemToSPListItem(T item, SPListItem spListItem)
         {
             spListItem["Title"] = item.Title;
         }
@@ -171,7 +98,7 @@ namespace SPCommon.Infrastructure.Repository
         /// </summary>
         /// <param name="spItem"></param>
         /// <returns></returns>
-        protected virtual T MapSPListItemToEntityItem(SPListItem spItem)
+        public virtual T MapSPListItemToEntityItem(SPListItem spItem)
         {
             var itemMapper = new SharePointItemMapper<T>();
             var t = itemMapper.BuildEntityFromItem(spItem);

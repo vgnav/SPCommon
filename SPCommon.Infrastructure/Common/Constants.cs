@@ -1,6 +1,4 @@
-﻿using System.CodeDom;
-
-namespace SPCommon.Infrastructure.Common
+﻿namespace SPCommon.Infrastructure.Common
 {
     public static class Constants
     {
@@ -9,6 +7,12 @@ namespace SPCommon.Infrastructure.Common
             public const string AreaName = "Infastructure";
             public const string ServiceName = "SPCommon Logging Service";
 
+        }
+
+        public static class Repositories
+        {
+            public const string GenericListRepository = "List";
+            public const string GenericDocumentLibrary = "Document";
         }
     }
 }

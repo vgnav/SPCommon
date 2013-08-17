@@ -17,11 +17,22 @@ namespace SPCommon.Tests.IntegrationTests
         private const string LibUrl = "http://spdev/TestLibrary";
         private const string FileToUpload = @"C:\temp\testfile.txt";
         private const string FileToUpdate = @"C:\temp\updatefile.txt";
-        private readonly IDocumentRepository<TestDocument> _documentRepository;  
+        private readonly IDocumentRepository<TestDocument> _documentRepository;
+        private readonly SPWeb _web;
+        private readonly SPSite _site;
 
         public DocumentLibraryTests()
         {
-            _documentRepository = new DocumentRepository<TestDocument>(LibUrl, LibName);
+            var _site = new SPSite(LibUrl);
+            var _web = _site.OpenWeb();
+            _documentRepository = new GenericDocumentRepository<TestDocument>(_web, LibName);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            _web.Dispose();
+            _site.Dispose();
         }
 
         [TestMethod]

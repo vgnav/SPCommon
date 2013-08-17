@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.JSGrid;
+using Microsoft.SharePoint.WebControls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SPCommon.CAML;
 using SPCommon.Entity;
@@ -16,10 +15,24 @@ namespace SPCommon.Tests.IntegrationTests
         private const string ListName = "Test";
         private const string ListUrl = "http://spdev/lists/Test";
         private readonly IListRepository<TestEntity> _listRepository;
-
+        private readonly SPWeb _web;
+        private readonly SPSite _site;
+        
         public ListRepositoryTests()
         {
-            _listRepository = new ListRepository<TestEntity>(ListUrl, ListName);
+            //_listRepository =
+            //    (new ListFactory<TestEntity>(ListUrl, ListName)).GetRepository("List") as IListRepository<TestEntity>;
+            // _listRepository = new TestRepository<TestEntity>(ListUrl);
+            var _site = new SPSite(ListUrl);
+            var _web = _site.OpenWeb();
+            _listRepository = new GenericListRepository<TestEntity>(_web, ListName);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            _web.Dispose();
+            _site.Dispose();
         }
 
         [TestMethod]
@@ -177,4 +190,20 @@ namespace SPCommon.Tests.IntegrationTests
         public string TextColumn { get; set; }
         public bool YesNoColumn { get; set; }
     }
+
+    public class TestRepository<T> : GenericListRepository<T> where T : TestEntity, new()
+    {
+        private const string ListTitle = "Test";
+        
+        public TestRepository(SPWeb web)
+            : base(web, ListTitle)
+        {}
+
+        public override void MapEntityItemToSPListItem(T item, SPListItem spListItem)
+        {
+            base.MapEntityItemToSPListItem(item, spListItem);
+            spListItem["YesNoColumn"] = item.YesNoColumn ? "True" : "False";
+        }
+    }
+
 }

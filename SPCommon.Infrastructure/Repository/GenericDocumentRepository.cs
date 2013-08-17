@@ -6,25 +6,15 @@ using SPCommon.Interface;
 namespace SPCommon.Infrastructure.Repository
 {
     /// <summary>
-    /// The documentation for ListRepository covers most of this. The create / update / delete methods have been re-written for Document Libraries to support
+    /// The documentation for GenericListRepository covers most of this. The create / update / delete methods have been re-written for Document Libraries to support
     /// check-in/check-out, file-reads, file-uploads, etc.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DocumentRepository<T> : ListRepository<T>, IDocumentRepository<T> where T : BaseDocument, new()
+    public class GenericDocumentRepository<T> : GenericListRepository<T>, IDocumentRepository<T> where T : BaseDocument, new()
     {
         #region Constructors and private/protected variables
-
-        /// <summary>
-        /// Empty constructor required for SharePoint ServiceLocator
-        /// </summary>
-        public DocumentRepository()
-        {}
-
-        public DocumentRepository(string libraryUrl, string libraryName)
-            : base(libraryUrl, libraryName)
-        {}
-
-        public DocumentRepository(SPWeb web, string libraryName)
+        
+        public GenericDocumentRepository(SPWeb web, string libraryName)
             : base(web, libraryName)
         {}
 
@@ -33,22 +23,10 @@ namespace SPCommon.Infrastructure.Repository
         #region Interface methods
 
         public void DownloadFileData(T t)
-        {
-            if (Web == null)
-            {
-                Helper.Instance.OpenWeb(ListUrl, web =>
-                {
-                    if (string.IsNullOrEmpty(t.FileUrl))
-                        t = Read(t.Id);
-                    SetFileDataForItem(web, t);
-                });                
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(t.FileUrl))
-                    t = Read(t.Id);
-                SetFileDataForItem(Web, t);                
-            }
+        {   
+            if (string.IsNullOrEmpty(t.FileUrl))
+                t = Read(t.Id);
+            SetFileDataForItem(Web, t);                
         }
 
         #endregion
@@ -56,12 +34,12 @@ namespace SPCommon.Infrastructure.Repository
         #region Overridden methods
 
         /// <summary>
-        /// Extend ListRepository's MapSPListItemToEntityItem to include file data.
+        /// Extend GenericListRepository's MapSPListItemToEntityItem to include file data.
         /// NOTE: the binary data for the SPFile is not included. To get the binary data, call DownloadFileData(T entity)
         /// </summary>
         /// <param name="spItem"></param>
         /// <returns></returns>
-        protected override T MapSPListItemToEntityItem(SPListItem spItem)
+        public override T MapSPListItemToEntityItem(SPListItem spItem)
         {
             var t = base.MapSPListItemToEntityItem(spItem);
             var file = spItem.File;
