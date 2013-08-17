@@ -33,6 +33,20 @@ namespace SPCommon.Infrastructure.Factory
             throw new Exception("Cannot create a repository with the parameters provided");
         }
 
+        public IListRepository<T> GetListRepository<T>(SPWeb web, string listName) where T : BaseItem, new()
+        {
+            var dictionary = ProvideRepositories<T>(web);
+            if (dictionary.ContainsKey(listName)) return (IListRepository<T>)dictionary[listName];
+            return new GenericListRepository<T>(web, listName);
+        }
+
+        public IDocumentRepository<T> GetDocumentRepository<T>(SPWeb web, string listName) where T : BaseItem, new()
+        {
+            var dictionary = ProvideRepositories<T>(web);
+            if (dictionary.ContainsKey(listName)) return (IDocumentRepository<T>)dictionary[listName];
+            return new GenericDocumentRepository<T>(web, listName);
+        }
+
         public virtual Dictionary<string, IRepository<T>> ProvideRepositories<T>(SPWeb web) where T : BaseItem, new()
         {
             return new Dictionary<string, IRepository<T>>();

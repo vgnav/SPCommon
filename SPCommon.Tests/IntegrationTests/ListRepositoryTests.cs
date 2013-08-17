@@ -22,7 +22,7 @@ namespace SPCommon.Tests.IntegrationTests
         {
             _site = new SPSite(ListUrl);
             _web = _site.OpenWeb();
-            _listRepository = ClientFactory.Instance.Get<IListRepository<TestEntity>, TestEntity>(_web, ListName);
+            _listRepository = ClientFactory.Instance.GetListRepository<TestEntity>(_web, ListName);
         }
 
         [TestCleanup]
