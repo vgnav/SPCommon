@@ -55,6 +55,8 @@
     <Compile Include="Interface\ILogger.cs" />
     <Compile Include="Interface\IJSONSerializable.cs" />
     <Compile Include="Interface\IRepository.cs" />
+    <Compile Include="Interface\IRepositoryFactory.cs" />
+    <Compile Include="Interface\IServiceLocatable.cs" />
     <Compile Include="Serializers\JSON.cs" />
     <Compile Include="Serializers\JSONList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
