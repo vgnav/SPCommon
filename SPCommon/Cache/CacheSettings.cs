@@ -9,5 +9,7 @@ namespace SPCommon.Cache
         public int SingleItemId { get; set; }
         public object Context { get; set; }
         public string ListName { get; set; }
+        public int TimeToExpire { get; set; }
+        public bool IsSlidingCache { get; set; }
     }
 }

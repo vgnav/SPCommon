@@ -36,22 +36,23 @@
     <Reference Include="Microsoft.SharePoint.Taxonomy, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\Providers\IISCacheProvider.cs" />
-    <Compile Include="Cache\RepositoryCacheService.cs" />
+    <Compile Include="Cache\Providers\HttpCacheProvider.cs" />
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Common\Helper.cs" />
     <Compile Include="Common\SPLogger.cs" />
     <Compile Include="Common\SharePointItemMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository\CacheRepository.cs" />
     <Compile Include="Repository\GenericDocumentRepository.cs" />
     <Compile Include="Repository\GenericListRepository.cs" />
-    <Compile Include="Factory\RepositoryFactory.cs" />
+    <Compile Include="Factory\SPCommonRepositoryFactory.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

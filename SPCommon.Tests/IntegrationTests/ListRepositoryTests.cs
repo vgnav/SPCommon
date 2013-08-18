@@ -3,6 +3,7 @@ using Microsoft.SharePoint;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SPCommon.CAML;
 using SPCommon.Entity;
+using SPCommon.Infrastructure.Common;
 using SPCommon.Infrastructure.Factory;
 using SPCommon.Infrastructure.Repository;
 using SPCommon.Interface;
@@ -22,7 +23,7 @@ namespace SPCommon.Tests.IntegrationTests
         {
             _site = new SPSite(ListUrl);
             _web = _site.OpenWeb();
-            _listRepository = ClientFactory.Instance.GetListRepository<TestEntity>(_web, ListName);
+            _listRepository = (new ClientFactory(_web, ListName)).CreateListRepository<TestEntity>();
         }
 
         [TestCleanup]
@@ -207,17 +208,13 @@ namespace SPCommon.Tests.IntegrationTests
 
     public class ClientFactory : RepositoryFactory
     {
-        private ClientFactory(){}
-        private static ClientFactory _instance;
-        public new static ClientFactory Instance
-        {
-            get { return _instance ?? (_instance = new ClientFactory()); }
-        }
+        public ClientFactory(SPWeb web, string listName) : base(web, listName)
+        {}
 
-        public override Dictionary<string, IRepository<T>> ProvideRepositories<T>(SPWeb web)
+        protected override Dictionary<string, IRepository<T>> ProvideRepositories<T>()
         {
-            var repositories = base.ProvideRepositories<T>(web);
-            repositories.Add("Test", (IRepository<T>) new TestRepository(web));
+            var repositories = base.ProvideRepositories<T>();
+            repositories.Add("Test", new TestRepository(Web) as IRepository<T>);
             return repositories;
         }
     }

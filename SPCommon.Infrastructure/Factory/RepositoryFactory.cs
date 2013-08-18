@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.SharePoint;
 using SPCommon.Entity;
 using SPCommon.Infrastructure.Repository;
@@ -7,50 +6,43 @@ using SPCommon.Interface;
 
 namespace SPCommon.Infrastructure.Factory
 {
-    public class RepositoryFactory
+    /// <summary>
+    /// Extend this class in client solutions to provide your own repositories as well as the generic list and generic document library ones
+    /// Override the ProvideRepositories method and return a dictionary of your own repositories
+    /// </summary>
+    public class RepositoryFactory : IRepositoryFactory
     {
-        private static RepositoryFactory _instance;
-        public static RepositoryFactory Instance
+        protected readonly SPWeb Web;
+        protected readonly string ListName;
+
+        public RepositoryFactory(SPWeb web, string listName)
         {
-            get { return _instance ?? (_instance = new RepositoryFactory()); }
+            Web = web;
+            ListName = listName;
+        }
+        
+        public IListRepository<T> CreateListRepository<T>() where T : 
+            BaseItem, new()
+        {
+            var dictionary = ProvideRepositories<T>();
+            if (dictionary.ContainsKey(ListName)) return (IListRepository<T>)dictionary[ListName];
+            return new GenericListRepository<T>(Web, ListName);
         }
 
-        public TRepository Get<TRepository, T>(SPWeb web, string listName) where TRepository : IRepository<T>
+        public IDocumentRepository<T> CreateDocumentRepository<T>() 
             where T : BaseItem, new()
         {
-            var dictionary = ProvideRepositories<T>(web);
-            if (dictionary.ContainsKey(listName)) return (TRepository) dictionary[listName];
-            
-            var repositoryType = typeof (TRepository);
-            if (repositoryType == typeof (IListRepository<T>))
-            {
-                return (TRepository) (new GenericListRepository<T>(web, listName) as IRepository<T>);
-            }
-            if (repositoryType == typeof(IDocumentRepository<T>))
-            {
-                return (TRepository)(new GenericDocumentRepository<T>(web, listName) as IRepository<T>);
-            }
-            throw new Exception("Cannot create a repository with the parameters provided");
+            var dictionary = ProvideRepositories<T>();
+            if (dictionary.ContainsKey(ListName)) return (IDocumentRepository<T>)dictionary[ListName];
+            return new GenericDocumentRepository<T>(Web, ListName);
         }
 
-        public IListRepository<T> GetListRepository<T>(SPWeb web, string listName) where T : BaseItem, new()
-        {
-            var dictionary = ProvideRepositories<T>(web);
-            if (dictionary.ContainsKey(listName)) return (IListRepository<T>)dictionary[listName];
-            return new GenericListRepository<T>(web, listName);
-        }
-
-        public IDocumentRepository<T> GetDocumentRepository<T>(SPWeb web, string listName) where T : BaseItem, new()
-        {
-            var dictionary = ProvideRepositories<T>(web);
-            if (dictionary.ContainsKey(listName)) return (IDocumentRepository<T>)dictionary[listName];
-            return new GenericDocumentRepository<T>(web, listName);
-        }
-
-        public virtual Dictionary<string, IRepository<T>> ProvideRepositories<T>(SPWeb web) where T : BaseItem, new()
+        protected virtual Dictionary<string, IRepository<T>> ProvideRepositories<T>() 
+            where T : BaseItem, new()
         {
             return new Dictionary<string, IRepository<T>>();
         }
+
     }
 
 }

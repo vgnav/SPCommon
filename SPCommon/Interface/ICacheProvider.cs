@@ -2,14 +2,12 @@
 
 namespace SPCommon.Interface
 {
-    public interface ICacheProvider<T> where T : class
+    public interface ICacheProvider
     {
-        bool IsInCache();
-        IList<T> GetListFromCache();
-        IList<T> InsertListItems(IList<T> items);
-        void Refresh();
-        T GetSingleItem();
-        T InsertSingleItem(T item);
         ICacheSettings Settings { get; }
+        bool IsInCache();
+        void Clear();
+        T GetItemFromCache<T>() where T : class;
+        T PutItemIntoCache<T>(T t) where T : class;
     }
 }
