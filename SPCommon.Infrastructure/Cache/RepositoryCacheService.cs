@@ -17,7 +17,7 @@ namespace SPCommon.Infrastructure.Cache
         public RepositoryCacheService(ICacheSettings settings)
         {
             // Going against DI here, but for flexibility's sakes we create the default cache provider and repository
-            CacheProvider = new IISCacheProvider<T>(settings);
+            CacheProvider = new HttpCacheProvider<T>(settings);
             Repository = RepositoryFactory.Instance.GetListRepository<T>(settings.Context as SPWeb, settings.ListName);
         }
 

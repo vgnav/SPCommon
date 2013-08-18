@@ -14,5 +14,10 @@
             public const string GenericListRepository = "List";
             public const string GenericDocumentLibrary = "Document";
         }
+
+        public static class Cache
+        {
+            public const string ClearCacheFlag = "CLEAR_CACHE";
+        }
     }
 }
