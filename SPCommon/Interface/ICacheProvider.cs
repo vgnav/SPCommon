@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SPCommon.Interface
+﻿namespace SPCommon.Interface
 {
     public interface ICacheProvider
     {

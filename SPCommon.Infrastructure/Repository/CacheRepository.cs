@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Publishing;
-using Microsoft.SharePoint.WebControls;
 using SPCommon.Entity;
 using SPCommon.Infrastructure.Cache.Providers;
 using SPCommon.Infrastructure.Factory;

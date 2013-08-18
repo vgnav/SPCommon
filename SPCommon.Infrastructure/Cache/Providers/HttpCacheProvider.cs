@@ -42,6 +42,7 @@ namespace SPCommon.Infrastructure.Cache.Providers
                     server.Properties[ClearCacheFlag] = DateTime.Now;
                 else
                     server.Properties.Add(ClearCacheFlag, DateTime.Now);
+                server.Update();
             }
         }
     }
