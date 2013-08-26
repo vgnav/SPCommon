@@ -14,7 +14,7 @@ namespace SPCommon.ConsoleApp
         {
             // var listRepository = new GenericListRepository<TestEntity>(ListUrl, ListName);
             // var items = listRepository.FindAll();
-            Console.WriteLine(items.Count);
+            // Console.WriteLine(items.Count);
         }
     }
 

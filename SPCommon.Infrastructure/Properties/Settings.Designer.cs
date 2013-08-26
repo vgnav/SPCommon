@@ -22,5 +22,15 @@ namespace SPCommon.Infrastructure.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://spdev/_vti_bin/Lists.asmx")]
+        public string SPCommon_Infrastructure_SPWebService_Lists {
+            get {
+                return ((string)(this["SPCommon_Infrastructure_SPWebService_Lists"]));
+            }
+        }
     }
 }

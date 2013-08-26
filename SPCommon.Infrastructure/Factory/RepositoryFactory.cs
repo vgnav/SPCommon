@@ -8,8 +8,10 @@ using SPCommon.Interface;
 namespace SPCommon.Infrastructure.Factory
 {
     /// <summary>
-    /// Extend this class in client solutions to provide your own repositories as well as the generic list and generic document library ones
+    /// Extend this class in client solutions to provide your own repositories
     /// Override the ProvideRepositories method and return a dictionary of your own repositories
+    /// 
+    /// If there is no repository using the list name provided, then it will either return the generic list or document library repository
     /// </summary>
     public class RepositoryFactory : IRepositoryFactory
     {

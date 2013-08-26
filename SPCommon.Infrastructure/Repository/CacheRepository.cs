@@ -22,6 +22,11 @@ namespace SPCommon.Infrastructure.Repository
         private readonly ICacheProvider _cacheProvider;
         private readonly IRepository<T> _repository;
 
+        /// <summary>
+        /// Easiest use
+        /// Uses the generic list library as the base repository, and HttpCacheProvider with the cache settings provided
+        /// </summary>
+        /// <param name="settings"></param>
         public CacheRepository(ICacheSettings settings)
         {
             // Create default repository and cache providers
@@ -29,12 +34,24 @@ namespace SPCommon.Infrastructure.Repository
             _cacheProvider = new HttpCacheProvider(settings);
         }
         
+        /// <summary>
+        /// Use the factory provided to create a list repository
+        /// Use the cacheProvider provided as the cache object
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="cacheProvider"></param>
         public CacheRepository(IRepositoryFactory factory, ICacheProvider cacheProvider)
         {
             _repository = factory.CreateListRepository<T>();
             _cacheProvider = cacheProvider;
         }
 
+        /// <summary>
+        /// Use the repository provided as the base repository
+        /// Use the cacheProvider provided as the cache object
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <param name="cacheProvider"></param>
         public CacheRepository(IRepository<T> repository, ICacheProvider cacheProvider)
         {
             _repository = repository;
@@ -45,6 +62,11 @@ namespace SPCommon.Infrastructure.Repository
 
         #region Interface methods
 
+        /// <summary>
+        /// Creates an item of type T in the repository and then flushes the cache
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public bool Create(T t)
         {
             // Create the item and refresh the cache. Cache wil be updated on next fetch

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using Microsoft.SharePoint;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SPCommon.CAML;
@@ -216,6 +217,19 @@ namespace SPCommon.Tests.IntegrationTests
             var repositories = base.ProvideRepositories<T>();
             repositories.Add("Test", new TestRepository(Web) as IRepository<T>);
             return repositories;
+        }
+    }
+
+    public class TestWSRepo : GenericListWSRepository<TestEntity>
+    {
+        public TestWSRepo(ICredentials credentials, string url, string listName) : base(credentials, url, listName)
+        {
+        }
+
+        protected override Dictionary<string, string> ProvideItemFieldMap(TestEntity item)
+        {
+            var map = base.ProvideItemFieldMap(item);
+            return map;
         }
     }
 
