@@ -22,7 +22,7 @@ namespace SPCommon.Tests.IntegrationTests
         {
             _site = new SPSite(LibUrl);
             _web = _site.OpenWeb();
-            _documentRepository = RepositoryFactory.Instance.GetDocumentRepository<TestDocument>(_web, LibName);
+            _documentRepository = (new SPRepositoryFactory(_web, LibName)).CreateDocumentRepository<TestDocument>();
         }
 
         [TestCleanup]

@@ -30,7 +30,7 @@ namespace SPCommon.Infrastructure.Repository
         public CacheRepository(ICacheSettings settings)
         {
             // Create default repository and cache providers
-            _repository = (new RepositoryFactory(settings.Context as SPWeb, settings.ListName)).CreateListRepository<T>();
+            _repository = (new SPRepositoryFactory(settings.Context as SPWeb, settings.ListName)).CreateListRepository<T>();
             _cacheProvider = new HttpCacheProvider(settings);
         }
         

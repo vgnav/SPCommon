@@ -22,6 +22,7 @@ namespace SPCommon.CAML
         public string Column { get; set; }
         public string Type { get; set; }
         public string Value { get; set; }
+        public string AdditionalParams { get; set; }
         public CAMLOperator Operator { get; set; }
     }
     
@@ -47,7 +48,7 @@ namespace SPCommon.CAML
             return String.Format(@"<Where>{0}</Where>", GetCamlQuery());
         }
 
-        public string GetCamlQuery()
+        private string GetCamlQuery()
         {
             if (_expression == null) return string.Empty;
             if(_expression is CAMLExpression)
@@ -91,10 +92,11 @@ namespace SPCommon.CAML
 
         private static string GetFieldRefExpression(CAMLExpression expression)
         {
-            return String.Format(@"<FieldRef Name=""{0}""/><Value Type=""{1}""><![CDATA[{2}]]></Value>",
+            return String.Format(@"<FieldRef Name=""{0}"" {3}/><Value Type=""{1}""><![CDATA[{2}]]></Value>",
                                     expression.Column,
                                     expression.Type,
-                                    expression.Value);
+                                    expression.Value,
+                                    expression.AdditionalParams ?? string.Empty);
         }
     }
 }

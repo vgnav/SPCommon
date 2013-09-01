@@ -207,10 +207,11 @@ namespace SPCommon.Tests.IntegrationTests
         }
     }
 
-    public class ClientFactory : RepositoryFactory
+    public class ClientFactory : SPRepositoryFactory
     {
-        public ClientFactory(SPWeb web, string listName) : base(web, listName)
-        {}
+        public ClientFactory(SPWeb web, string key) : base(web, key)
+        {
+        }
 
         protected override Dictionary<string, IRepository<T>> ProvideRepositories<T>()
         {
@@ -220,16 +221,25 @@ namespace SPCommon.Tests.IntegrationTests
         }
     }
 
-    public class TestWSRepo : GenericListWSRepository<TestEntity>
+    public class TestRepo : BaseWebServiceListRepository<TestEntity>
     {
-        public TestWSRepo(ICredentials credentials, string url, string listName) : base(credentials, url, listName)
+        public TestRepo(ICredentials credentials, string url) : base(credentials, url, "Test")
         {
         }
 
         protected override Dictionary<string, string> ProvideItemFieldMap(TestEntity item)
         {
             var map = base.ProvideItemFieldMap(item);
+            // Add more values to the fieldmap
             return map;
+        }
+
+        protected override IList<string> ProvideViewFields()
+        {
+            var fields = base.ProvideViewFields();
+            fields.Add("TextColumn");
+            fields.Add("YesNoColumn");
+            return fields;
         }
     }
 

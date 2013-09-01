@@ -13,7 +13,7 @@ namespace SPCommon.Infrastructure.Repository
     /// GenericListRepository needs to be used with a class whose type has been derived from SPCommon.Entity.BaseListItem
     /// ListRepositoy is designed to work with dependency injection
     /// Initialise/construct with your SPWeb value (usually coming from SPContext.Current.Web)
-    /// ListName is compulsory (otherwise it won't work, obviously)
+    /// Key is compulsory (otherwise it won't work, obviously)
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>

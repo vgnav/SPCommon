@@ -12,7 +12,7 @@ namespace SPCommon.ConsoleApp
 
         static void Main(string[] args)
         {
-            // var listRepository = new GenericListRepository<TestEntity>(ListUrl, ListName);
+            // var listRepository = new GenericListRepository<TestEntity>(ListUrl, Key);
             // var items = listRepository.FindAll();
             // Console.WriteLine(items.Count);
         }
